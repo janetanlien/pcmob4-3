@@ -15,9 +15,21 @@ const ChatScreen = ({ navigation }) => {
 		const unsubscribe = db
 		.orderBy('createdAt', 'desc')
 		.onSnapshot((collectionSnapshot) => {
-			const serverMessages = collectionSnapshot.docs.map((doc) => doc.data())
+			const serverMessages = collectionSnapshot.docs.map ((doc) => {
+				const data = doc.data();
+				console.log(data);
+				const jsDate = new Date(data.createdAt.seconds * 1000);
+
+				const newDoc = {
+					...data,
+					createdAt: jsDate,
+				};
+				return newDoc;
+			});
+
+
 			setMessages(serverMessages)
-		})
+		});
 
 		firebase.auth().onAuthStateChanged((user) => {
 			if (user) {
@@ -68,7 +80,8 @@ const ChatScreen = ({ navigation }) => {
 				},
 			}}
 			user={{
-				_id: 1,
+				_id: firebase.auth().currentUser.uid,
+				name: firebase.auth().currentUser.email,
 			}}
 		/>
 
